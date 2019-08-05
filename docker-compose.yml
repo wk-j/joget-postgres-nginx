@@ -5,10 +5,10 @@ services:
   nginx:
     image: nginx:1.15
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/site:/usr/share/nginx/html
-      - ./nginx/my-site.com.crt:/etc/nginx/my-site.com.crt
-      - ./nginx/my-site.com.key:/etc/nginx/my-site.com.key
+      - ./z-nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./z-nginx/site:/usr/share/nginx/html
+      - ./z-nginx/my-site.com.crt:/etc/nginx/my-site.com.crt
+      - ./z-nginx/my-site.com.key:/etc/nginx/my-site.com.key
 
     ports:
       - 443:443
@@ -17,40 +17,33 @@ services:
       - joget
 
   joget:
-    image: jogetworkflow/joget-enterprise:6.0.20
+    build:
+      context: .
+      dockerfile: Dockerfile
 
     depends_on:
-      - mysql
-
-    # @todo Switch from MySQL to PostgreSQL
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_DATABASE=jwdb
-      - MYSQL_PASSWORD=joget
-      - MYSQL_USER=joget
+      - postgres
 
     volumes:
-      - ./data/wflow:/opt/joget/wflow
-      - ./tomcat/server.xml:/opt/joget/apache-tomcat-8.5.41/conf/server.xml
-      - ./tomcat/tomcat-users.xml:/opt/joget/apache-tomcat-8.5.41/conf/tomcat-users.xml
+      - ./z-joget/app_datasource.properties:/opt/joget/wflow/app_datasource.properties
+      - ./z-joget/app_datasource-postgresql.properties:/opt/joget/wflow/app_datasource-postgresql.properties
+      - ./z-joget/postgresql-42.2.1.jar:/opt/joget/apache-tomcat-8.5.41/lib/postgresql.jar
+      - ./z-tomcat/server.xml:/opt/joget/apache-tomcat-8.5.41/conf/server.xml
+      - ./z-tomcat/tomcat-users.xml:/opt/joget/apache-tomcat-8.5.41/conf/tomcat-users.xml
+      - ./z-tomcat/ssl.keystore:/ssl.keystore
+      - ./z-tomcat/ssl.truststore:/ssl.truststore
       - ./logs/tomcat:/opt/joget/apache-tomcat-8.5.41/logs
-      - ./tomcat/ssl.keystore:/ssl.keystore
-      - ./tomcat/ssl.truststore:/ssl.truststore
 
-  mysql:
-      image: mysql:5.7
-
-      environment:
-        - MYSQL_DATABASE=jwdb
-        - MYSQL_PASSWORD=joget
-        - MYSQL_ROOT_PASSWORD=jwdb
-        - MYSQL_USER=joget
-
-      ports:
-        - 3306:3306
-
-      volumes:
-        - v-mysql-database:/var/lib/mysql
+  postgres:
+    image: postgres:10.1
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    command: postgres -c max_connections=300 -c log_min_messages=LOG
+    volumes:
+      - ./z-postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - v-postgres-data:/var/lib/postgresql/data
 
 volumes:
-  v-mysql-database:
+  v-postgres-data:

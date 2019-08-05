@@ -10,6 +10,8 @@ packages
 tools
 publish
 logs
+binary
+joget-enterprise-linux-6.0.20
 
 .paket
 .settings
