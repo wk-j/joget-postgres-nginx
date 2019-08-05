@@ -29,7 +29,6 @@ services:
       - ./z-joget/app_datasource-postgresql.properties:/opt/joget/wflow/app_datasource-postgresql.properties
       - ./z-joget/postgresql-42.2.1.jar:/opt/joget/apache-tomcat-8.5.41/lib/postgresql.jar
       - ./z-tomcat/server.xml:/opt/joget/apache-tomcat-8.5.41/conf/server.xml
-      - ./z-tomcat/tomcat-users.xml:/opt/joget/apache-tomcat-8.5.41/conf/tomcat-users.xml
       - ./z-tomcat/ssl.keystore:/ssl.keystore
       - ./z-tomcat/ssl.truststore:/ssl.truststore
       - ./logs/tomcat:/opt/joget/apache-tomcat-8.5.41/logs

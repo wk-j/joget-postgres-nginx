@@ -9,6 +9,9 @@ openssl req \
     -days 365 \
     -out nginx/my-site.com.crt
 
-docker-compose up
+mkdir binary
+wget https://www.joget.org/downloads/enterprise/joget-enterprise-linux-6.0.20.tar.gz -P binary
+
+docker-compose build
 open https://my-site.com/jw
 ```
