@@ -1,0 +1,56 @@
+version: "3.1"
+
+services:
+
+  nginx:
+    image: nginx:1.15
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/site:/usr/share/nginx/html
+      - ./nginx/my-site.com.crt:/etc/nginx/my-site.com.crt
+      - ./nginx/my-site.com.key:/etc/nginx/my-site.com.key
+
+    ports:
+      - 443:443
+
+    depends_on:
+      - joget
+
+  joget:
+    image: jogetworkflow/joget-enterprise:6.0.20
+
+    depends_on:
+      - mysql
+
+    # @todo Switch from MySQL to PostgreSQL
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=jwdb
+      - MYSQL_PASSWORD=joget
+      - MYSQL_USER=joget
+
+    volumes:
+      - ./data/wflow:/opt/joget/wflow
+      - ./tomcat/server.xml:/opt/joget/apache-tomcat-8.5.41/conf/server.xml
+      - ./tomcat/tomcat-users.xml:/opt/joget/apache-tomcat-8.5.41/conf/tomcat-users.xml
+      - ./logs/tomcat:/opt/joget/apache-tomcat-8.5.41/logs
+      - ./tomcat/ssl.keystore:/ssl.keystore
+      - ./tomcat/ssl.truststore:/ssl.truststore
+
+  mysql:
+      image: mysql:5.7
+
+      environment:
+        - MYSQL_DATABASE=jwdb
+        - MYSQL_PASSWORD=joget
+        - MYSQL_ROOT_PASSWORD=jwdb
+        - MYSQL_USER=joget
+
+      ports:
+        - 3306:3306
+
+      volumes:
+        - v-mysql-database:/var/lib/mysql
+
+volumes:
+  v-mysql-database:
