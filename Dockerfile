@@ -31,7 +31,7 @@ RUN \
     chown -R app:0 /opt/joget ; \
     chmod -R g+rw /opt/joget
 
-USER app
+USER root
 
 EXPOSE 8080
 
