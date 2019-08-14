@@ -20,6 +20,8 @@ RUN cd /opt/joget/ ; \
     rm -rf /opt/joget/${JOGET_VERSION}/ ; \
     rm /opt/joget/${JOGET_VERSION}.tar.gz
 
+RUN mkdir /opt/joget/wflow/app_forms
+
 RUN \
     groupadd -r app ; \
     useradd -r -g app -d /home/app -c "Docker image user" app ; \
